@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Provinces {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  Cities    Cities[]
+  Pivot     Pivot[]
+}
+
+model Cities {
+  id         Int         @id @default(autoincrement())
+  name       String
+  provinceId Int
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  deletedAt  DateTime?
+  Provinces  Provinces   @relation(fields: [provinceId], references: [id])
+  Districts  Districts[]
+  Pivot      Pivot[]
+}
+
+model Districts {
+  id           Int            @id @default(autoincrement())
+  name         String
+  cityId       Int
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  deletedAt    DateTime?
+  Subdistricts Subdistricts[]
+  Cities       Cities         @relation(fields: [cityId], references: [id])
+  Pivot        Pivot[]
+}
+
+model Subdistricts {
+  id         Int       @id @default(autoincrement())
+  name       String
+  districtId Int
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+  Districts  Districts @relation(fields: [districtId], references: [id])
+  Pivot      Pivot[]
+}
+
+model Pivot {
+  id            Int          @id @default(autoincrement())
+  provinceId    Int
+  cityId        Int
+  districtId    Int
+  subdistrictId Int
+  postal        String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  deletedAt     DateTime?
+  Provinces     Provinces    @relation(fields: [provinceId], references: [id])
+  Cities        Cities       @relation(fields: [cityId], references: [id])
+  Districts     Districts    @relation(fields: [districtId], references: [id])
+  Subdistricts  Subdistricts @relation(fields: [subdistrictId], references: [id])
+}
